@@ -35,6 +35,7 @@ void Request::clear()
     operation_.clear();
     full_key_.clear();
     attr_names_.clear();
+    full_attr_items_.clear();
     key_item_strings_.clear();
     key_item_mac_addresses_.clear();
     attr_item_strings_.clear();
@@ -142,6 +143,7 @@ void Request::parseKey(const KeyOpFieldsValuesTuple& request)
 void Request::parseAttrs(const KeyOpFieldsValuesTuple& request)
 {
     const auto not_found = std::end(request_description_.attr_item_types);
+    full_attr_items_ = kfvFieldsValues(request);
 
     for (auto i = kfvFieldsValues(request).begin();
          i != kfvFieldsValues(request).end(); i++)

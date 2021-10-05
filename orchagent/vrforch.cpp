@@ -6,9 +6,11 @@
 #include <exception>
 
 #include "sai.h"
+#include "sai_serialize.h"
 #include "macaddress.h"
 #include "orch.h"
 #include "request_parser.h"
+#include "return_code.h"
 #include "vrforch.h"
 #include "vxlanorch.h"
 #include "directory.h"
@@ -93,12 +95,15 @@ bool VRFOrch::addOperation(const Request& request)
                                                                             attrs.data());
         if (status != SAI_STATUS_SUCCESS)
         {
-            SWSS_LOG_ERROR("Failed to create virtual router name: %s, rv: %d", vrf_name.c_str(), status);
-            task_process_status handle_status = handleSaiCreateStatus(SAI_API_VIRTUAL_ROUTER, status);
-            if (handle_status != task_success)
-            {
-                return parseHandleSaiStatusFailure(handle_status);
-            }
+            ReturnCode rc = ReturnCode(status)
+                            << "Failed to create virtual router name: "
+                            << vrf_name << ", rv: " << sai_serialize_status(status);
+            SWSS_LOG_ERROR("%s", rc.message().c_str());
+            m_publisher.publish(request.getTableName(), request.getFullKey(),
+                                request.getFullAttrFields(), rc);
+            handleSaiCreateStatus(SAI_API_VIRTUAL_ROUTER, status);
+            // Remove from orchagent queue when there is SAI error
+            return true;
         }
 
         vrf_table_[vrf_name].vrf_id = router_id;
@@ -127,12 +132,15 @@ bool VRFOrch::addOperation(const Request& request)
             sai_status_t status = sai_virtual_router_api->set_virtual_router_attribute(router_id, &attr);
             if (status != SAI_STATUS_SUCCESS)
             {
-                SWSS_LOG_ERROR("Failed to update virtual router attribute. vrf name: %s, rv: %d", vrf_name.c_str(), status);
-                task_process_status handle_status = handleSaiSetStatus(SAI_API_VIRTUAL_ROUTER, status);
-                if (handle_status != task_success)
-                {
-                    return parseHandleSaiStatusFailure(handle_status);
-                }
+                ReturnCode rc = ReturnCode(status)
+                                << "Failed to update virtual router attribute. vrf name: "
+                                << vrf_name << ", rv: " << sai_serialize_status(status);
+                SWSS_LOG_ERROR("%s", rc.message().c_str());
+                m_publisher.publish(request.getTableName(), request.getFullKey(),
+                                    request.getFullAttrFields(), rc);
+                handleSaiSetStatus(SAI_API_VIRTUAL_ROUTER, status);
+                // Remove from orchagent queue when there is SAI error
+                return true;
             }
         }
 
@@ -146,6 +154,8 @@ bool VRFOrch::addOperation(const Request& request)
         SWSS_LOG_NOTICE("VRF '%s' was updated", vrf_name.c_str());
     }
 
+    m_publisher.publish(request.getTableName(), request.getFullKey(),
+                        request.getFullAttrFields(), ReturnCode());
     return true;
 }
 
@@ -157,7 +167,11 @@ bool VRFOrch::delOperation(const Request& request)
     const std::string& vrf_name = request.getKeyString(0);
     if (vrf_table_.find(vrf_name) == std::end(vrf_table_))
     {
-        SWSS_LOG_ERROR("VRF '%s' doesn't exist", vrf_name.c_str());
+        ReturnCode rc = ReturnCode(StatusCode::SWSS_RC_NOT_FOUND)
+                        << "VRF '" << vrf_name << "' doesn't exist";
+        SWSS_LOG_ERROR("%s", rc.message().c_str());
+        m_publisher.publish(request.getTableName(), request.getFullKey(),
+                            request.getFullAttrFields(), rc);
         return true;
     }
 
@@ -168,12 +182,15 @@ bool VRFOrch::delOperation(const Request& request)
     sai_status_t status = sai_virtual_router_api->remove_virtual_router(router_id);
     if (status != SAI_STATUS_SUCCESS)
     {
-        SWSS_LOG_ERROR("Failed to remove virtual router name: %s, rv:%d", vrf_name.c_str(), status);
-        task_process_status handle_status = handleSaiRemoveStatus(SAI_API_VIRTUAL_ROUTER, status);
-        if (handle_status != task_success)
-        {
-            return parseHandleSaiStatusFailure(handle_status);
-        }
+        ReturnCode rc = ReturnCode(status)
+                        << "Failed to remove virtual router name: "
+                        << vrf_name << ", rv:" << sai_serialize_status(status);
+        SWSS_LOG_ERROR("%s", rc.message().c_str());
+        m_publisher.publish(request.getTableName(), request.getFullKey(),
+                            request.getFullAttrFields(), rc);
+        handleSaiRemoveStatus(SAI_API_VIRTUAL_ROUTER, status);
+        // Remove from orchagent queue when there is SAI error
+        return true;
     }
 
     vrf_table_.erase(vrf_name);
@@ -187,6 +204,8 @@ bool VRFOrch::delOperation(const Request& request)
 
     SWSS_LOG_NOTICE("VRF '%s' was removed", vrf_name.c_str());
 
+    m_publisher.publish(request.getTableName(), request.getFullKey(),
+                        request.getFullAttrFields(), ReturnCode());
     return true;
 }
 

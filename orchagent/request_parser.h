@@ -85,6 +85,12 @@ public:
         return attr_names_;
     }
 
+    const std::vector<swss::FieldValueTuple>& getFullAttrFields() const
+    {
+        assert(is_parsed_);
+        return full_attr_items_;
+    }
+
     const std::string& getAttrString(const std::string& attr_name) const
     {
         assert(is_parsed_);
@@ -209,6 +215,7 @@ private:
     std::unordered_map<int, swss::IpPrefix> key_item_ip_prefix_;
     std::unordered_map<int, uint64_t> key_item_uint_;
     std::unordered_set<std::string> attr_names_;
+    std::vector<swss::FieldValueTuple> full_attr_items_;
     // FIXME: Make one union with all the values, except string
     std::unordered_map<std::string, std::string> attr_item_strings_;
     std::unordered_map<std::string, bool> attr_item_bools_;

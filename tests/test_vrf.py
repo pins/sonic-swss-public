@@ -12,6 +12,9 @@ class TestVrf(object):
         self.pdb = swsscommon.DBConnector(0, dvs.redis_sock, 0)
         self.adb = swsscommon.DBConnector(1, dvs.redis_sock, 0)
         self.cdb = swsscommon.DBConnector(4, dvs.redis_sock, 0)
+        self.sdb = swsscommon.DBConnector(63, dvs.redis_sock, 0)
+        self.response_consumer = swsscommon.NotificationConsumer(
+            self.pdb, "APPL_DB_VRF_TABLE_RESPONSE_CHANNEL")
 
     def create_entry(self, tbl, key, pairs):
         fvs = swsscommon.FieldValuePairs(pairs)
@@ -54,6 +57,24 @@ class TestVrf(object):
                                                    (value, name, expected_attributes[name])
 
 
+    def verify_response(self, consumer, key, attr_list, status, err_message = "SWSS_RC_SUCCESS"):
+        consumer.readData()
+        (op, data, fvs) = consumer.pop()
+        assert data == key
+        assert op == status
+        assert len(fvs) >= 1
+        assert fvs[0][0] == "err_str"
+        assert fvs[0][1] == err_message
+        fvs = fvs[1:]
+
+        attr_keys = {entry[0] for entry in fvs}
+        assert attr_keys == set(attr_list.keys())
+
+        for name, value in fvs:
+            assert attr_list[name] == value, "Wrong value %s for the attribute %s = %s" % \
+                (value, name, attr_list[name])
+
+
     def vrf_create(self, dvs, vrf_name, attributes, expected_attributes):
         # check that the vrf wasn't exist before
         assert self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER") == 1, "The initial state is incorrect"
@@ -81,6 +102,16 @@ class TestVrf(object):
         for an in range(len(attributes)):
             exp_attr[attributes[an][0]] = attributes[an][1]
         self.is_vrf_attributes_correct(self.pdb, "VRF_TABLE", vrf_name, exp_attr)
+
+        # check application state database
+        tbl = swsscommon.Table(self.sdb, "VRF_TABLE")
+        intf_entries = tbl.getKeys()
+        assert len(intf_entries) == 1
+        assert intf_entries[0] == vrf_name
+        self.is_vrf_attributes_correct(self.sdb, "VRF_TABLE", vrf_name, exp_attr)
+
+        # check response channel
+        self.verify_response(self.response_consumer, vrf_name, exp_attr, "SWSS_RC_SUCCESS")
 
         # check that the vrf entry was created
         assert self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER") == 2, "The vrf wasn't created"
@@ -113,6 +144,14 @@ class TestVrf(object):
         intf_entries = tbl.getKeys()
         assert vrf_name not in intf_entries
 
+        # check application state database
+        tbl = swsscommon.Table(self.sdb, "VRF_TABLE")
+        intf_entries = tbl.getKeys()
+        assert vrf_name not in intf_entries
+
+        # check response channel
+        self.verify_response(self.response_consumer, vrf_name, {}, "SWSS_RC_SUCCESS")
+
         # check that the vrf entry was removed
         assert self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER") == 1, "The vrf wasn't removed"
 
@@ -126,6 +165,18 @@ class TestVrf(object):
     def vrf_update(self, vrf_name, attributes, expected_attributes, state):
         # update the VRF entry in Config DB
         self.create_entry_tbl(self.cdb, "VRF", vrf_name, attributes)
+
+        # check application database
+        exp_attr = {}
+        for an in range(len(attributes)):
+            exp_attr[attributes[an][0]] = attributes[an][1]
+        self.is_vrf_attributes_correct(self.pdb, "VRF_TABLE", vrf_name, exp_attr)
+
+        # check application state database
+        self.is_vrf_attributes_correct(self.sdb, "VRF_TABLE", vrf_name, exp_attr)
+
+        # check response channel
+        self.verify_response(self.response_consumer, vrf_name, exp_attr, "SWSS_RC_SUCCESS")
 
         # check correctness of the created attributes
         self.is_vrf_attributes_correct(
@@ -192,7 +243,6 @@ class TestVrf(object):
             state = self.vrf_create(dvs, vrf_name, req_attr, exp_attr)
             self.vrf_remove(dvs, vrf_name, state)
 
-
     def test_VRFMgr(self, dvs, testlog):
         self.setup_db(dvs)
 
@@ -238,7 +288,7 @@ class TestVrf(object):
         )
 
         # try to update each attribute
-        req_attr = []
+        req_attr = [('empty', 'empty')]
         exp_attr = {}
         for attr in attributes:
             req_res, exp_res = attr[2]()
@@ -278,6 +328,10 @@ class TestVrf(object):
         intf_entries_cnt = self.how_many_entries_exist(self.pdb, "VRF_TABLE")
         assert intf_entries_cnt == maximum_vrf_cnt
 
+        # check app_state_db
+        intf_entries_cnt = self.how_many_entries_exist(self.sdb, "VRF_TABLE")
+        assert intf_entries_cnt == maximum_vrf_cnt
+
         # check asic_db
         current_entries_cnt = self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER")
         assert (current_entries_cnt - initial_entries_cnt) == maximum_vrf_cnt
@@ -297,6 +351,10 @@ class TestVrf(object):
         intf_entries_cnt = self.how_many_entries_exist(self.pdb, "VRF_TABLE")
         assert intf_entries_cnt == 0
 
+        # check app_state_db
+        intf_entries_cnt = self.how_many_entries_exist(self.sdb, "VRF_TABLE")
+        assert intf_entries_cnt == 0
+
         # check asic_db
         current_entries_cnt = self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER")
         assert (current_entries_cnt - initial_entries_cnt) == 0
@@ -304,6 +362,47 @@ class TestVrf(object):
         # check linux kernel
         (exitcode, num) = dvs.runcmd(['sh', '-c', "ip link show | grep Vrf | wc -l"])
         assert num.strip() == '0'
+
+    def test_VRFMgr_Error(self, dvs, testlog):
+        self.setup_db(dvs)
+        assert self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER") == 1, "The initial state is incorrect"
+
+        # create VRF with invalid attribute in APPL DB
+        tbl = swsscommon.ProducerStateTable(self.pdb, "VRF_TABLE")
+        vrf_name = "Vrf-invalid"
+        attributes = [
+            ('v4',            'true'),
+            ('v6',            'false'),
+            ('ttl_action',    'trap'),
+            ('ip_opt_action', 'trap'),
+            ('l3_mc_action',  'drop'),
+            ('invalid',       'true'),
+        ]
+        exp_attr = {}
+        for an in range(len(attributes)):
+            exp_attr[attributes[an][0]] = attributes[an][1]
+        tbl.set(vrf_name, attributes)
+
+        # check application database
+        tbl = swsscommon.Table(self.pdb, "VRF_TABLE")
+        intf_entries = tbl.getKeys()
+        assert len(intf_entries) == 1
+        assert intf_entries[0] == vrf_name
+        self.is_vrf_attributes_correct(self.pdb, "VRF_TABLE", vrf_name, exp_attr)
+
+        # check application state database
+        tbl = swsscommon.Table(self.sdb, "VRF_TABLE")
+        intf_entries = tbl.getKeys()
+        assert len(intf_entries) == 0
+
+        # check response channel
+        self.verify_response(self.response_consumer, vrf_name, exp_attr, "SWSS_RC_INVALID_PARAM", "[OrchAgent] Parse error: Unknown attribute name: invalid")
+
+        # check ASIC DB
+        assert self.how_many_entries_exist(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER") == 1, "The vrf shouldn't be created"
+
+        # clean up APPL DB
+        self.delete_entry_tbl(self.pdb, "VRF_TABLE", vrf_name)
 
 
 # Add Dummy always-pass test at end as workaroud

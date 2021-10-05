@@ -1,6 +1,8 @@
 #include <fstream>
 #include <iostream>
 #include <inttypes.h>
+#include <sstream>
+#include <stdexcept>
 #include <sys/time.h>
 #include "timestamp.h"
 #include "orch.h"
@@ -197,9 +199,16 @@ size_t Consumer::refillToSync()
     auto subTable = dynamic_cast<SubscriberStateTable *>(consumerTable);
     if (subTable != NULL)
     {
-        std::deque<KeyOpFieldsValuesTuple> entries;
-        subTable->pops(entries);
-        return addToSync(entries);
+        size_t update_size = 0;
+        size_t total_size = 0;
+        do
+        {
+            std::deque<KeyOpFieldsValuesTuple> entries;
+            subTable->pops(entries);
+            update_size = addToSync(entries);
+            total_size += update_size;
+        } while (update_size != 0);
+        return total_size;
     }
     else
     {
@@ -215,10 +224,13 @@ void Consumer::execute()
 {
     SWSS_LOG_ENTER();
 
-    std::deque<KeyOpFieldsValuesTuple> entries;
-    getConsumerTable()->pops(entries);
-
-    addToSync(entries);
+    size_t update_size = 0;
+    do
+    {
+        std::deque<KeyOpFieldsValuesTuple> entries;
+        getConsumerTable()->pops(entries);
+        update_size = addToSync(entries);
+    } while (update_size != 0);
 
     drain();
 }
@@ -729,9 +741,9 @@ task_process_status Orch::handleSaiCreateStatus(sai_api_t api, sai_status_t stat
                     SWSS_LOG_WARN("SAI_STATUS_SUCCESS is not expected in handleSaiCreateStatus");
                     return task_success;
                 default:
-                    SWSS_LOG_ERROR("Encountered failure in create operation, exiting orchagent, SAI API: %s, status: %s",
+                    SWSS_LOG_ERROR("Encountered failure in create operation, SAI API: %s, status: %s",
                                 sai_serialize_api(api).c_str(), sai_serialize_status(status).c_str());
-                    exit(EXIT_FAILURE);
+                return task_failed;
             }
     }
     return task_need_retry;
@@ -775,9 +787,9 @@ task_process_status Orch::handleSaiSetStatus(sai_api_t api, sai_status_t status,
                     exit(EXIT_FAILURE);
             }
         default:
-            SWSS_LOG_ERROR("Encountered failure in set operation, exiting orchagent, SAI API: %s, status: %s",
+            SWSS_LOG_ERROR("Encountered failure in set operation, SAI API: %s, status: %s",
                         sai_serialize_api(api).c_str(), sai_serialize_status(status).c_str());
-            exit(EXIT_FAILURE);
+            return task_failed;
     }
 
     return task_need_retry;
@@ -803,9 +815,9 @@ task_process_status Orch::handleSaiRemoveStatus(sai_api_t api, sai_status_t stat
             SWSS_LOG_WARN("SAI_STATUS_SUCCESS is not expected in handleSaiRemoveStatus");
             return task_success;
         default:
-            SWSS_LOG_ERROR("Encountered failure in remove operation, exiting orchagent, SAI API: %s, status: %s",
+            SWSS_LOG_ERROR("Encountered failure in remove operation, SAI API: %s, status: %s",
                         sai_serialize_api(api).c_str(), sai_serialize_status(status).c_str());
-            exit(EXIT_FAILURE);
+            return task_failed;
     }
     return task_need_retry;
 }
@@ -866,6 +878,7 @@ void Orch2::doTask(Consumer &consumer)
     while (it != consumer.m_toSync.end())
     {
         bool erase_from_queue = true;
+        ReturnCode rc;
         try
         {
             request_.parse(it->second);
@@ -883,26 +896,44 @@ void Orch2::doTask(Consumer &consumer)
             }
             else
             {
-                SWSS_LOG_ERROR("Wrong operation. Check RequestParser: %s", op.c_str());
+                rc = ReturnCode(StatusCode::SWSS_RC_INVALID_PARAM)
+                     << "Wrong operation, only supporting SET and DEL, but got "
+                     << op;
+                SWSS_LOG_ERROR("%s", rc.message().c_str());
             }
         }
         catch (const std::invalid_argument& e)
         {
-            SWSS_LOG_ERROR("Parse error: %s", e.what());
+            rc = ReturnCode(StatusCode::SWSS_RC_INVALID_PARAM)
+                 << "Parse error: " << e.what();
+            SWSS_LOG_ERROR("%s", rc.message().c_str());
         }
         catch (const std::logic_error& e)
         {
-            SWSS_LOG_ERROR("Logic error: %s", e.what());
+            rc = ReturnCode(StatusCode::SWSS_RC_INTERNAL)
+                 << "Logic error: " << e.what();
+            SWSS_LOG_ERROR("%s", rc.message().c_str());
+            SWSS_RAISE_CRITICAL_STATE(rc.message());
         }
         catch (const std::exception& e)
         {
-            SWSS_LOG_ERROR("Exception was catched in the request parser: %s", e.what());
+            rc = ReturnCode(StatusCode::SWSS_RC_INTERNAL)
+                 << "Exception was catched in the request parser: " << e.what();
+            SWSS_LOG_ERROR("%s", rc.message().c_str());
+            SWSS_RAISE_CRITICAL_STATE(rc.message());
         }
         catch (...)
         {
-            SWSS_LOG_ERROR("Unknown exception was catched in the request parser");
+            rc = ReturnCode(StatusCode::SWSS_RC_UNKNOWN)
+                 << "Unknown exception was catched in the request parser";
+            SWSS_LOG_ERROR("%s", rc.message().c_str());
         }
         request_.clear();
+        if (!rc.ok())
+        {
+            m_publisher.publish(consumer.getTableName(), kfvKey(it->second),
+                               kfvFieldsValues(it->second), rc);
+        }
 
         if (erase_from_queue)
         {
@@ -914,4 +945,3 @@ void Orch2::doTask(Consumer &consumer)
         }
     }
 }
-
