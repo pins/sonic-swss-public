@@ -38,6 +38,7 @@
 #include "mlagorch.h"
 #include "muxorch.h"
 #include "macsecorch.h"
+#include "p4orch/p4orch.h"
 
 using namespace swss;
 
