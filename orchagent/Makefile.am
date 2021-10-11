@@ -5,6 +5,8 @@ INCLUDES = -I $(top_srcdir)/lib \
            -I debug_counter \
            -I pbh
 
+SUBDIRS = p4orch/tests
+
 CFLAGS_SAI = -I /usr/include/sai
 
 swssdir = $(datadir)/swss

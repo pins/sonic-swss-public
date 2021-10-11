@@ -4,7 +4,9 @@ INCLUDES = -I $(top_srcdir) -I $(ORCHAGENT_DIR) -I $(P4ORCH_DIR) -I $(top_srcdir
 
 CFLAGS_SAI = -I /usr/include/sai
 
-bin_PROGRAMS = p4orch_tests p4orch_tests_asan p4orch_tests_tsan p4orch_tests_usan
+TESTS = p4orch_tests p4orch_tests_asan p4orch_tests_tsan p4orch_tests_usan
+
+noinst_PROGRAMS = p4orch_tests p4orch_tests_asan p4orch_tests_tsan p4orch_tests_usan
 
 if DEBUG
 DBGFLAGS = -ggdb -DDEBUG
@@ -16,7 +18,7 @@ CFLAGS_GTEST =
 LDADD_GTEST = -lgtest -lgtest_main -lgmock -lgmock_main
 CFLAGS_COVERAGE = --coverage -fprofile-arcs -ftest-coverage
 LDADD_COVERAGE = -lgcov
-CFLAGS_ASAN = -fsanitize=address
+CFLAGS_ASAN = -fsanitize=address -static-libasan
 CFLAGS_TSAN = -fsanitize=thread
 CFLAGS_USAN = -fsanitize=undefined
 
