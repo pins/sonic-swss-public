@@ -8,8 +8,8 @@ class P4RtMirrorSessionWrapper(util.DBInterface):
   """Interface to interact with APP DB and ASIC DB tables for P4RT mirror session object."""
 
   # database and SAI constants
-  APP_DB_TBL_NAME = "P4RT"
-  TBL_NAME = "FIXED_MIRROR_SESSION_TABLE"
+  APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
+  TBL_NAME = swsscommon.APP_P4RT_MIRROR_SESSION_TABLE_NAME
   ACTION = "action"
   PORT = "port"
   SRC_IP = "src_ip"

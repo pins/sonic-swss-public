@@ -764,7 +764,7 @@ TEST_F(NeighborManagerTest, DrainValidAttributes) {
 
   const std::string appl_db_key =
       std::string(APP_P4RT_NEIGHBOR_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR +
+      kTableKeyDelimiter +
       CreateNeighborAppDbKey(kRouterInterfaceId1, kNeighborId1);
 
   // Enqueue entry for create operation.
@@ -819,7 +819,7 @@ TEST_F(NeighborManagerTest, DrainInvalidAppDbEntryKey) {
   const std::string invalid_neighbor_key =
       R"({"match/router_interface_id:intf-3/4,match/neighbor_id:10.0.0.22"})";
   const std::string appl_db_key = std::string(APP_P4RT_NEIGHBOR_TABLE_NAME) +
-                                  APP_P4RT_TABLE_NAME_SEPARATOR +
+                                  kTableKeyDelimiter +
                                   invalid_neighbor_key;
 
   // Enqueue entry for create operation.
@@ -841,14 +841,14 @@ TEST_F(NeighborManagerTest, DrainInvalidAppDbEntryAttributes) {
   // Non-existent router interface id in neighbor key.
   std::string appl_db_key =
       std::string(APP_P4RT_NEIGHBOR_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR +
+      kTableKeyDelimiter +
       CreateNeighborAppDbKey(kRouterInterfaceId2, kNeighborId1);
 
   std::vector<swss::FieldValueTuple> attributes;
   Enqueue(swss::KeyOpFieldsValuesTuple(appl_db_key, SET_COMMAND, attributes));
 
   appl_db_key = std::string(APP_P4RT_NEIGHBOR_TABLE_NAME) +
-                APP_P4RT_TABLE_NAME_SEPARATOR +
+                kTableKeyDelimiter +
                 CreateNeighborAppDbKey(kRouterInterfaceId1, kNeighborId1);
   // Invalid destination mac address attribute.
   attributes.clear();
@@ -877,7 +877,7 @@ TEST_F(NeighborManagerTest, DrainInvalidOperation) {
 
   const std::string appl_db_key =
       std::string(APP_P4RT_NEIGHBOR_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR +
+      kTableKeyDelimiter +
       CreateNeighborAppDbKey(kRouterInterfaceId1, kNeighborId1);
 
   std::vector<swss::FieldValueTuple> attributes;

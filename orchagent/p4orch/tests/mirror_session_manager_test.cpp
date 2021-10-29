@@ -347,7 +347,7 @@ TEST_F(MirrorSessionManagerTest, SuccessfulEnqueueAndDrain) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -395,7 +395,7 @@ TEST_F(MirrorSessionManagerTest, SuccessfulEnqueueAndDrain) {
          {prependParamField(p4orch::kTos), kTos2}};
 
   app_db_entry = {std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-                      APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+                      kTableKeyDelimiter + j.dump(),
                   SET_COMMAND, fvs};
 
   Enqueue(app_db_entry);
@@ -483,7 +483,7 @@ TEST_F(MirrorSessionManagerTest, SuccessfulEnqueueAndDrain) {
   // 3. Delete the entry.
   fvs = {};
   app_db_entry = {std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-                      APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+                      kTableKeyDelimiter + j.dump(),
                   DEL_COMMAND, fvs};
 
   Enqueue(app_db_entry);
@@ -518,7 +518,7 @@ TEST_F(MirrorSessionManagerTest,
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -546,7 +546,7 @@ TEST_F(MirrorSessionManagerTest, DrainShouldFailForUnknownOp) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       "unknown_op", fvs);
 
   Enqueue(app_db_entry);
@@ -575,7 +575,7 @@ TEST_F(MirrorSessionManagerTest,
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -605,7 +605,7 @@ TEST_F(MirrorSessionManagerTest,
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -632,7 +632,7 @@ TEST_F(MirrorSessionManagerTest, DrainShouldFailForIncompleteAppDbEntry) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs_missing_tos);
 
   Enqueue(app_db_entry);
@@ -660,7 +660,7 @@ TEST_F(MirrorSessionManagerTest, DrainShouldFailForUnknownPort) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -688,7 +688,7 @@ TEST_F(MirrorSessionManagerTest, DrainShouldFailWhenCreateSaiCallFails) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -727,7 +727,7 @@ TEST_F(MirrorSessionManagerTest, DrainShouldFailWhenDeleteSaiCallFails) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -747,7 +747,7 @@ TEST_F(MirrorSessionManagerTest, DrainShouldFailWhenDeleteSaiCallFails) {
 
   fvs = {};
   app_db_entry = {std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-                      APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+                      kTableKeyDelimiter + j.dump(),
                   DEL_COMMAND, fvs};
 
   Enqueue(app_db_entry);
@@ -1007,7 +1007,7 @@ TEST_F(MirrorSessionManagerTest, UpdateFailureShouldNotChangeExistingEntry) {
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -1046,7 +1046,7 @@ TEST_F(MirrorSessionManagerTest, UpdateFailureShouldNotChangeExistingEntry) {
          {prependParamField(p4orch::kTos), kTos2}};
 
   app_db_entry = {std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-                      APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+                      kTableKeyDelimiter + j.dump(),
                   SET_COMMAND, fvs};
 
   Enqueue(app_db_entry);
@@ -1092,7 +1092,7 @@ TEST_F(MirrorSessionManagerTest,
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
       std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-          APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+          kTableKeyDelimiter + j.dump(),
       SET_COMMAND, fvs);
 
   Enqueue(app_db_entry);
@@ -1131,7 +1131,7 @@ TEST_F(MirrorSessionManagerTest,
          {prependParamField(p4orch::kTos), kTos2}};
 
   app_db_entry = {std::string(APP_P4RT_MIRROR_SESSION_TABLE_NAME) +
-                      APP_P4RT_TABLE_NAME_SEPARATOR + j.dump(),
+                      kTableKeyDelimiter + j.dump(),
                   SET_COMMAND, fvs};
 
   Enqueue(app_db_entry);

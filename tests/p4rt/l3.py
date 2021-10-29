@@ -9,8 +9,8 @@ class P4RtRouterInterfaceWrapper(util.DBInterface):
     """Interface to interact with APP DB and ASIC DB tables for P4RT router interface object."""
 
     # database and SAI constants
-    APP_DB_TBL_NAME = "P4RT"
-    TBL_NAME = "FIXED_ROUTER_INTERFACE_TABLE"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
+    TBL_NAME = swsscommon.APP_P4RT_ROUTER_INTERFACE_TABLE_NAME
     ASIC_DB_TBL_NAME = "ASIC_STATE:SAI_OBJECT_TYPE_ROUTER_INTERFACE"
     SAI_ATTR_SRC_MAC = "SAI_ROUTER_INTERFACE_ATTR_SRC_MAC_ADDRESS"
     SAI_ATTR_TYPE = "SAI_ROUTER_INTERFACE_ATTR_TYPE"
@@ -56,8 +56,8 @@ class P4RtNeighborWrapper(util.DBInterface):
     """Interface to interact with APP DB and ASIC DB tables for P4RT neighbor object."""
 
     # database and SAI constants
-    APP_DB_TBL_NAME = "P4RT"
-    TBL_NAME = "FIXED_NEIGHBOR_TABLE"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
+    TBL_NAME = swsscommon.APP_P4RT_NEIGHBOR_TABLE_NAME
     ASIC_DB_TBL_NAME = "ASIC_STATE:SAI_OBJECT_TYPE_NEIGHBOR_ENTRY"
     SAI_ATTR_DST_MAC = "SAI_NEIGHBOR_ENTRY_ATTR_DST_MAC_ADDRESS"
 
@@ -99,8 +99,8 @@ class P4RtNextHopWrapper(util.DBInterface):
     """Interface to interact with APP DB and ASIC DB tables for P4RT nexthop object."""
 
     # database and SAI constants
-    APP_DB_TBL_NAME = "P4RT"
-    TBL_NAME = "FIXED_NEXTHOP_TABLE"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
+    TBL_NAME = swsscommon.APP_P4RT_NEXTHOP_TABLE_NAME
     ASIC_DB_TBL_NAME = "ASIC_STATE:SAI_OBJECT_TYPE_NEXT_HOP"
     SAI_ATTR_TYPE = "SAI_NEXT_HOP_ATTR_TYPE"
     SAI_ATTR_IP = "SAI_NEXT_HOP_ATTR_IP"
@@ -160,8 +160,8 @@ class P4RtWcmpGroupWrapper(util.DBInterface):
     """Interface to interact with APP DB and ASIC DB tables for P4RT wcmp group object."""
 
     # database and SAI constants
-    APP_DB_TBL_NAME = "P4RT"
-    TBL_NAME = "FIXED_WCMP_GROUP_TABLE"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
+    TBL_NAME = swsscommon.APP_P4RT_WCMP_GROUP_TABLE_NAME
     ASIC_DB_GROUP_TBL_NAME = "ASIC_STATE:SAI_OBJECT_TYPE_NEXT_HOP_GROUP"
     SAI_ATTR_GROUP_TYPE = "SAI_NEXT_HOP_GROUP_ATTR_TYPE"
     SAI_NEXT_HOP_GROUP_TYPE_DYNAMIC_UNORDERED_ECMP = "SAI_NEXT_HOP_GROUP_TYPE_DYNAMIC_UNORDERED_ECMP"
@@ -263,7 +263,7 @@ class P4RtRouteWrapper(util.DBInterface):
     """Interface to interact with APP DB and ASIC DB tables for P4RT route object."""
 
     # database and SAI constants
-    APP_DB_TBL_NAME = "P4RT"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
     ASIC_DB_TBL_NAME = "ASIC_STATE:SAI_OBJECT_TYPE_ROUTE_ENTRY"
     SAI_ATTR_PACKET_ACTION = "SAI_ROUTE_ENTRY_ATTR_PACKET_ACTION"
     SAI_ATTR_PACKET_ACTION_FORWARD = "SAI_PACKET_ACTION_FORWARD"

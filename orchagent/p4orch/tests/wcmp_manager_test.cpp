@@ -1312,7 +1312,7 @@ TEST_F(WcmpManagerTest, ValidateWcmpGroupEntryFailsWhenWeightLessThanOne) {
 
 TEST_F(WcmpManagerTest, WcmpGroupInvalidOperationInDrainFails) {
   const std::string kKeyPrefix = std::string(APP_P4RT_WCMP_GROUP_TABLE_NAME) +
-                                 APP_P4RT_TABLE_NAME_SEPARATOR;
+                                 kTableKeyDelimiter;
   p4_oid_mapper_->setOID(SAI_OBJECT_TYPE_NEXT_HOP, kNexthopKey1, kNexthopOid1);
   p4_oid_mapper_->setOID(SAI_OBJECT_TYPE_NEXT_HOP, kNexthopKey2, kNexthopOid2);
   nlohmann::json j;
@@ -1347,7 +1347,7 @@ TEST_F(WcmpManagerTest, WcmpGroupInvalidOperationInDrainFails) {
 
 TEST_F(WcmpManagerTest, WcmpGroupUndefinedAttributesInDrainFails) {
   const std::string kKeyPrefix = std::string(APP_P4RT_WCMP_GROUP_TABLE_NAME) +
-                                 APP_P4RT_TABLE_NAME_SEPARATOR;
+                                 kTableKeyDelimiter;
   nlohmann::json j;
   j[prependMatchField(p4orch::kWcmpGroupId)] = kWcmpGroupId1;
   std::vector<swss::FieldValueTuple> attributes;
@@ -1363,7 +1363,7 @@ TEST_F(WcmpManagerTest, WcmpGroupUndefinedAttributesInDrainFails) {
 
 TEST_F(WcmpManagerTest, WcmpGroupCreateAndDeleteInDrainSucceeds) {
   const std::string kKeyPrefix = std::string(APP_P4RT_WCMP_GROUP_TABLE_NAME) +
-                                 APP_P4RT_TABLE_NAME_SEPARATOR;
+                                 kTableKeyDelimiter;
   p4_oid_mapper_->setOID(SAI_OBJECT_TYPE_NEXT_HOP, kNexthopKey1, kNexthopOid1);
   p4_oid_mapper_->setOID(SAI_OBJECT_TYPE_NEXT_HOP, kNexthopKey2, kNexthopOid2);
   nlohmann::json j;
@@ -1441,7 +1441,7 @@ TEST_F(WcmpManagerTest, WcmpGroupCreateAndDeleteInDrainSucceeds) {
 
 TEST_F(WcmpManagerTest, WcmpGroupCreateAndUpdateInDrainSucceeds) {
   const std::string kKeyPrefix = std::string(APP_P4RT_WCMP_GROUP_TABLE_NAME) +
-                                 APP_P4RT_TABLE_NAME_SEPARATOR;
+                                 kTableKeyDelimiter;
   p4_oid_mapper_->setOID(SAI_OBJECT_TYPE_NEXT_HOP, kNexthopKey1, kNexthopOid1);
   p4_oid_mapper_->setOID(SAI_OBJECT_TYPE_NEXT_HOP, kNexthopKey2, kNexthopOid2);
   nlohmann::json j;

@@ -1057,7 +1057,7 @@ class AclManagerTest : public ::testing::Test {
 TEST_F(AclManagerTest, DrainTableTuplesToProcessSetDelRequestSucceeds) {
   const auto& p4rtAclTableName =
       std::string(APP_P4RT_ACL_TABLE_DEFINITION_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + kAclIngressTableName;
+      kTableKeyDelimiter + kAclIngressTableName;
   EnqueueTableTuple(swss::KeyOpFieldsValuesTuple(
       {p4rtAclTableName, SET_COMMAND, getDefaultTableDefFieldValueTuples()}));
 
@@ -1091,7 +1091,7 @@ TEST_F(AclManagerTest, DrainTableTuplesToProcessSetDelRequestSucceeds) {
 TEST_F(AclManagerTest, DrainTableTuplesToProcessUpdateRequestExpectFails) {
   const auto& p4rtAclTableName =
       std::string(APP_P4RT_ACL_TABLE_DEFINITION_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + kAclIngressTableName;
+      kTableKeyDelimiter + kAclIngressTableName;
   auto attributes = getDefaultTableDefFieldValueTuples();
   EnqueueTableTuple(swss::KeyOpFieldsValuesTuple(
       {p4rtAclTableName, SET_COMMAND, attributes}));
@@ -1123,7 +1123,7 @@ TEST_F(AclManagerTest, DrainTableTuplesToProcessUpdateRequestExpectFails) {
 
 TEST_F(AclManagerTest, DrainTableTuplesWithInvalidTableNameOpsFails) {
   auto p4rtAclTableName = std::string("UNDEFINED") +
-                          APP_P4RT_TABLE_NAME_SEPARATOR + kAclIngressTableName;
+                          kTableKeyDelimiter + kAclIngressTableName;
   EnqueueTableTuple(swss::KeyOpFieldsValuesTuple(
       {p4rtAclTableName, SET_COMMAND, getDefaultTableDefFieldValueTuples()}));
   // Drain table tuples to process SET request on invalid ACL definition table
@@ -1132,7 +1132,7 @@ TEST_F(AclManagerTest, DrainTableTuplesWithInvalidTableNameOpsFails) {
   EXPECT_EQ(nullptr, GetAclTable(kAclIngressTableName));
 
   p4rtAclTableName = std::string(APP_P4RT_ACL_TABLE_DEFINITION_NAME) +
-                     APP_P4RT_TABLE_NAME_SEPARATOR + kAclIngressTableName;
+                     kTableKeyDelimiter + kAclIngressTableName;
   EnqueueTableTuple(swss::KeyOpFieldsValuesTuple(
       {p4rtAclTableName, "UPDATE", getDefaultTableDefFieldValueTuples()}));
   // Drain table tuples to process invalid operation: "UPDATE"
@@ -1144,7 +1144,7 @@ TEST_F(AclManagerTest, DrainTableTuplesWithInvalidFieldFails) {
   auto attributes = getDefaultTableDefFieldValueTuples();
   const auto& p4rtAclTableName =
       std::string(APP_P4RT_ACL_TABLE_DEFINITION_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + kAclIngressTableName;
+      kTableKeyDelimiter + kAclIngressTableName;
 
   // Invalid attribute field
   attributes.push_back(swss::FieldValueTuple{"undefined", "undefined"});
@@ -2536,7 +2536,7 @@ TEST_F(AclManagerTest, DrainRuleTuplesToProcessSetRequestSucceeds) {
       "ipv6_dst\":\"fdf8:f53b:82e4::53 & "
       "fdf8:f53b:82e4::53\",\"priority\":15}";
   const auto& rule_tuple_key = std::string(kAclIngressTableName) +
-                               APP_P4RT_TABLE_NAME_SEPARATOR +
+                               kTableKeyDelimiter +
                                acl_rule_json_key;
   EnqueueRuleTuple(swss::KeyOpFieldsValuesTuple(
       {rule_tuple_key, SET_COMMAND, getDefaultRuleFieldValueTuples()}));
@@ -2572,7 +2572,7 @@ TEST_F(AclManagerTest, DrainRuleTuplesToProcessSetDelRequestSucceeds) {
       "ipv6_dst\":\"fdf8:f53b:82e4::53 & "
       "fdf8:f53b:82e4::53\",\"priority\":15}";
   const auto& rule_tuple_key = std::string(kAclIngressTableName) +
-                               APP_P4RT_TABLE_NAME_SEPARATOR +
+                               kTableKeyDelimiter +
                                acl_rule_json_key;
   EnqueueRuleTuple(
       swss::KeyOpFieldsValuesTuple({rule_tuple_key, SET_COMMAND, attributes}));
@@ -2633,7 +2633,7 @@ TEST_F(AclManagerTest,
       "ipv6_dst\":\"fdf8:f53b:82e4::53 & "
       "fdf8:f53b:82e4::53\",\"priority\":15}";
   auto rule_tuple_key = std::string("INVALID_TABLE_NAME") +
-                        APP_P4RT_TABLE_NAME_SEPARATOR + acl_rule_json_key;
+                        kTableKeyDelimiter + acl_rule_json_key;
   EnqueueRuleTuple(
       swss::KeyOpFieldsValuesTuple({rule_tuple_key, SET_COMMAND, attributes}));
   // Drain rule tuple to process SET request with invalid ACL table name:
@@ -2651,7 +2651,7 @@ TEST_F(AclManagerTest,
       "ipv6_dst\":\"fdf8:f53b:82e4::53 & "
       "fdf8:f53b:82e4::53\"}";
   rule_tuple_key = std::string(kAclIngressTableName) +
-                   APP_P4RT_TABLE_NAME_SEPARATOR + acl_rule_json_key;
+                   kTableKeyDelimiter + acl_rule_json_key;
   acl_rule_key =
       "match/ether_type=0x0800:match/ipv6_dst=fdf8:f53b:82e4::53 & "
       "fdf8:f53b:82e4::53";
@@ -2728,7 +2728,7 @@ TEST_F(AclManagerTest, DrainRuleTuplesWithInvalidCommand) {
       "ipv6_dst\":\"fdf8:f53b:82e4::53 & "
       "fdf8:f53b:82e4::53\",\"priority\":15}";
   const auto& rule_tuple_key = std::string(kAclIngressTableName) +
-                               APP_P4RT_TABLE_NAME_SEPARATOR +
+                               kTableKeyDelimiter +
                                acl_rule_json_key;
   EnqueueRuleTuple(swss::KeyOpFieldsValuesTuple(
       {rule_tuple_key, "INVALID_COMMAND", attributes}));

@@ -835,7 +835,7 @@ TEST_F(RouterInterfaceManagerTest,
 TEST_F(RouterInterfaceManagerTest, DrainValidAttributes) {
   const std::string appl_db_key =
       std::string(APP_P4RT_ROUTER_INTERFACE_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + std::string(kRouterIntfAppDbKey);
+      kTableKeyDelimiter + std::string(kRouterIntfAppDbKey);
 
   // Enqueue entry for create operation.
   std::vector<swss::FieldValueTuple> attributes;
@@ -885,7 +885,7 @@ TEST_F(RouterInterfaceManagerTest, DrainInvalidAppDbEntryKey) {
       R"({"match/router_interface_id:intf-3/4"})";
   const std::string appl_db_key =
       std::string(APP_P4RT_ROUTER_INTERFACE_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + invalid_router_intf_key;
+      kTableKeyDelimiter + invalid_router_intf_key;
 
   // Enqueue entry for create operation.
   std::vector<swss::FieldValueTuple> attributes;
@@ -898,7 +898,7 @@ TEST_F(RouterInterfaceManagerTest, DrainInvalidAppDbEntryKey) {
 TEST_F(RouterInterfaceManagerTest, DrainInvalidAppDbEntryAttributes) {
   const std::string appl_db_key =
       std::string(APP_P4RT_ROUTER_INTERFACE_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + std::string(kRouterIntfAppDbKey);
+      kTableKeyDelimiter + std::string(kRouterIntfAppDbKey);
 
   // Invalid port attribute.
   std::vector<swss::FieldValueTuple> attributes;
@@ -921,7 +921,7 @@ TEST_F(RouterInterfaceManagerTest, DrainInvalidAppDbEntryAttributes) {
 TEST_F(RouterInterfaceManagerTest, DrainInvalidOperation) {
   const std::string appl_db_key =
       std::string(APP_P4RT_ROUTER_INTERFACE_TABLE_NAME) +
-      APP_P4RT_TABLE_NAME_SEPARATOR + std::string(kRouterIntfAppDbKey);
+      kTableKeyDelimiter + std::string(kRouterIntfAppDbKey);
 
   // Enqueue entry for invalid operation.
   std::vector<swss::FieldValueTuple> attributes;

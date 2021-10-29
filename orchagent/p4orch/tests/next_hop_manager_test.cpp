@@ -668,7 +668,7 @@ TEST_F(NextHopManagerTest, DrainValidAppEntryShouldSucceed) {
       {prependParamField(p4orch::kRouterInterfaceId), kRouterInterfaceId2}};
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
-      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR +
+      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + kTableKeyDelimiter +
           j.dump(),
       SET_COMMAND, fvs);
 
@@ -694,7 +694,7 @@ TEST_F(NextHopManagerTest, DrainAppEntryWithInvalidOpShouldBeNoOp) {
       {prependParamField(p4orch::kRouterInterfaceId), kRouterInterfaceId2}};
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
-      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR +
+      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + kTableKeyDelimiter +
           j.dump(),
       "INVALID_OP", fvs);
 
@@ -718,7 +718,7 @@ TEST_F(NextHopManagerTest, DrainAppEntryWithInvalidFieldShouldBeNoOp) {
       {"unexpected_field", "unexpected_value"}};
 
   swss::KeyOpFieldsValuesTuple app_db_entry(
-      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR +
+      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + kTableKeyDelimiter +
           j.dump(),
       "INVALID_OP", fvs);
 
@@ -742,7 +742,7 @@ TEST_F(NextHopManagerTest, DrainUpdateRequestShouldBeUnsupported) {
       {prependParamField(p4orch::kNeighborId), kNeighborId2},
       {prependParamField(p4orch::kRouterInterfaceId), kRouterInterfaceId2}};
   swss::KeyOpFieldsValuesTuple app_db_entry(
-      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR +
+      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + kTableKeyDelimiter +
           j.dump(),
       SET_COMMAND, fvs);
 
@@ -773,7 +773,7 @@ TEST_F(NextHopManagerTest, DrainDeleteRequestShouldSucceedForExistingNextHop) {
   j[prependMatchField(p4orch::kNexthopId)] = kNextHopId;
   std::vector<swss::FieldValueTuple> fvs;
   swss::KeyOpFieldsValuesTuple app_db_entry(
-      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR +
+      std::string(APP_P4RT_NEXTHOP_TABLE_NAME) + kTableKeyDelimiter +
           j.dump(),
       DEL_COMMAND, fvs);
   EXPECT_CALL(mock_sai_next_hop_,

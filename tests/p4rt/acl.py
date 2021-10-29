@@ -26,8 +26,8 @@ class P4RtAclTableDefinitionWrapper(util.DBInterface):
     SAI_ACL_TABLE_ATTR_SIZE = "SAI_ACL_TABLE_ATTR_SIZE"
 
     # table name in APP_DB and attribute fields
-    APP_DB_TBL_NAME = "P4RT"
-    TBL_NAME = "DEFINITION"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
+    TBL_NAME = swsscommon.APP_P4RT_ACL_TABLE_DEFINITION_NAME
     STAGE_FIELD = "stage"
     PRIORITY_FIELD = "priority"
     SIZE_FIELD = "size"
@@ -68,7 +68,7 @@ class P4RtAclRuleWrapper(util.DBInterface):
     SAI_ATTR_ACTION_SET_USER_TRAP_ID = "SAI_ACL_ENTRY_ATTR_ACTION_SET_USER_TRAP_ID"
 
     # table name in APP_DB and attribute fields
-    APP_DB_TBL_NAME = "P4RT"
+    APP_DB_TBL_NAME = swsscommon.APP_P4RT_TABLE_NAME
     ACTION = "action"
     METER_CIR = "meter/cir"
     METER_CBURST = "meter/cburst"

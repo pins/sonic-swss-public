@@ -17,7 +17,7 @@ std::string prependParamField(const std::string& str) {
 
 void parseP4RTKey(const std::string& key, std::string* table_name,
                   std::string* key_content) {
-  auto pos = key.find_first_of(APP_P4RT_TABLE_NAME_SEPARATOR);
+  auto pos = key.find_first_of(kTableKeyDelimiter);
   if (pos == std::string::npos) {
     *table_name = "";
     *key_content = "";

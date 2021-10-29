@@ -1532,7 +1532,7 @@ TEST_F(RouteManagerTest, DeleteIpv6RouteSucceeds) {
 
 TEST_F(RouteManagerTest, RouteCreateAndUpdateInDrainSucceeds) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   p4_oid_mapper_.setOID(SAI_OBJECT_TYPE_NEXT_HOP,
                         KeyGenerator::generateNextHopKey(kNexthopId1),
                         kNexthopOid1);
@@ -1586,7 +1586,7 @@ TEST_F(RouteManagerTest, RouteCreateAndUpdateInDrainSucceeds) {
 
 TEST_F(RouteManagerTest, RouteCreateAndDeleteInDrainSucceeds) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   p4_oid_mapper_.setOID(SAI_OBJECT_TYPE_NEXT_HOP,
                         KeyGenerator::generateNextHopKey(kNexthopId1),
                         kNexthopOid1);
@@ -1623,7 +1623,7 @@ TEST_F(RouteManagerTest, RouteCreateAndDeleteInDrainSucceeds) {
 
 TEST_F(RouteManagerTest, RouteCreateInDrainSucceedsWhenVrfIsEmpty) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   const std::string kDefaultVrfName = "";  // Default Vrf
   auto swss_ipv4_route_prefix = swss::IpPrefix(kIpv4Prefix);
   sai_ip_prefix_t sai_ipv4_route_prefix;
@@ -1666,7 +1666,7 @@ TEST_F(RouteManagerTest, RouteCreateInDrainSucceedsWhenVrfIsEmpty) {
 
 TEST_F(RouteManagerTest, DeserializeRouteEntryInDrainFails) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   Enqueue(swss::KeyOpFieldsValuesTuple(kKeyPrefix + "{{{{{{{{{{{{", SET_COMMAND,
                                        std::vector<swss::FieldValueTuple>{}));
   Drain();
@@ -1674,7 +1674,7 @@ TEST_F(RouteManagerTest, DeserializeRouteEntryInDrainFails) {
 
 TEST_F(RouteManagerTest, ValidateRouteEntryInDrainFailsWhenVrfDoesNotExist) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   p4_oid_mapper_.setOID(SAI_OBJECT_TYPE_NEXT_HOP,
                         KeyGenerator::generateNextHopKey(kNexthopId1),
                         kNexthopOid1);
@@ -1695,7 +1695,7 @@ TEST_F(RouteManagerTest, ValidateRouteEntryInDrainFailsWhenVrfDoesNotExist) {
 TEST_F(RouteManagerTest,
        ValidateRouteEntryInDrainFailsWhenNexthopDoesNotExist) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   nlohmann::json j;
   j[prependMatchField(p4orch::kVrfId)] = gVrfName;
   j[prependMatchField(p4orch::kIpv4Dst)] = kIpv4Prefix;
@@ -1712,7 +1712,7 @@ TEST_F(RouteManagerTest,
 
 TEST_F(RouteManagerTest, ValidateSetRouteEntryInDrainFails) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   p4_oid_mapper_.setOID(SAI_OBJECT_TYPE_NEXT_HOP,
                         KeyGenerator::generateNextHopKey(kNexthopId1),
                         kNexthopOid1);
@@ -1730,7 +1730,7 @@ TEST_F(RouteManagerTest, ValidateSetRouteEntryInDrainFails) {
 
 TEST_F(RouteManagerTest, ValidateDelRouteEntryInDrainFails) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   p4_oid_mapper_.setOID(SAI_OBJECT_TYPE_NEXT_HOP,
                         KeyGenerator::generateNextHopKey(kNexthopId1),
                         kNexthopOid1);
@@ -1750,7 +1750,7 @@ TEST_F(RouteManagerTest, ValidateDelRouteEntryInDrainFails) {
 
 TEST_F(RouteManagerTest, InvalidCommandInDrainFails) {
   const std::string kKeyPrefix =
-      std::string(APP_P4RT_IPV4_TABLE_NAME) + APP_P4RT_TABLE_NAME_SEPARATOR;
+      std::string(APP_P4RT_IPV4_TABLE_NAME) + kTableKeyDelimiter;
   p4_oid_mapper_.setOID(SAI_OBJECT_TYPE_NEXT_HOP,
                         KeyGenerator::generateNextHopKey(kNexthopId1),
                         kNexthopOid1);
