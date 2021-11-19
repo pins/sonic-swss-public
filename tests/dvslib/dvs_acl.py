@@ -252,7 +252,7 @@ class DVSAcl:
             num_tables: The total number of ACL tables in ASIC DB.
             stage: The stage of the ACL table that was created.
         """
-        acl_table_group_ids = self.get_acl_table_group_ids(len(bind_ports))
+        acl_table_group_ids = self.asic_db.wait_for_n_keys(self.ADB_ACL_GROUP_TABLE_NAME, len(bind_ports))
 
         port_groups = []
         for port in bind_ports:
