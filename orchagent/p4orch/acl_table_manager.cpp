@@ -243,6 +243,10 @@ ReturnCode AclTableManager::processAddTableRequest(
                          << "ACL table stage " << QuotedVar(app_db_entry.stage)
                          << " is invalid");
   }
+  if (gSwitchOrch->getAclGroupOidsBindingToSwitch().empty()) {
+      // Create default ACL groups binding to switch
+      gSwitchOrch->initAclGroupsBindToSwitch();
+  }
 
   P4AclTableDefinition acl_table_definition(
       app_db_entry.acl_table_name, stage, app_db_entry.priority,

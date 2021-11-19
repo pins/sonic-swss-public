@@ -68,6 +68,7 @@ class TestP4RTAcl(object):
             self._p4rt_acl_table_definition_obj.appl_db, "APPL_DB_P4RT_RESPONSE_CHANNEL"
         )
 
+    @pytest.mark.skip(reason="p4orch is not enabled")
     def test_AclRulesAddUpdateDelPass(self, dvs, testlog):
         # initialize ACL table objects and database connectors
         self._set_up(dvs)
